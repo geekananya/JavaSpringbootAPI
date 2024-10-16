@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ErrorDTO {
-    private String message;
-    private int code;
-    private boolean success;
+public class LoginResponse {
+    private String token;
+    private long expiresIn;
 }

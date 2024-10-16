@@ -1,10 +1,12 @@
 package com.consultaddtraining.javaproject.springboot_project.controllers;
 
-import com.consultaddtraining.javaproject.springboot_project.dto.PostDTO;
-import com.consultaddtraining.javaproject.springboot_project.dto.UserDTO;
-import com.consultaddtraining.javaproject.springboot_project.dto.UserRegisterDTO;
+import com.consultaddtraining.javaproject.springboot_project.Entities.UserEntity;
+import com.consultaddtraining.javaproject.springboot_project.dto.*;
+import com.consultaddtraining.javaproject.springboot_project.services.AuthService;
+import com.consultaddtraining.javaproject.springboot_project.services.JWTService;
 import com.consultaddtraining.javaproject.springboot_project.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,10 +17,34 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    private final UserService userService;
+    private AuthenticationManager authenticationManager;    //to access this dependency we make a bean
 
-    public UserController(UserService userService) {
+    @Autowired
+    private final UserService userService;
+    private final AuthService authService;
+    private final JWTService jwtService;
+
+    public UserController(UserService userService, AuthService authService, JWTService jwtService) {
         this.userService = userService;
+        this.authService = authService;
+        this.jwtService = jwtService;
+    }
+
+    @PostMapping(path = "/register")
+    public LoginResponse registerUser(UserRegisterDTO request){
+        UserEntity user = authService.signup(request);
+        String jwt = jwtService.generateToken(user);
+
+        return new LoginResponse(jwt, jwtService.getExpirationTime());
+    }
+
+    @PostMapping(path = "/login")
+    public LoginResponse login(UserLoginDTO request){
+        UserEntity user = authService.authenticate(request);
+
+        String jwt = jwtService.generateToken(user);
+
+        return new LoginResponse(jwt, jwtService.getExpirationTime());
     }
 
     @GetMapping(path = "/")
@@ -31,11 +57,6 @@ public class UserController {
     @GetMapping(path = "/{id}")
     public UserDTO getUser(@PathVariable("id") Long empId){
         return userService.getUserById(empId);
-    }
-
-    @PostMapping(path = "/register")
-    public UserDTO registerUser(UserRegisterDTO request){
-        return userService.createNewUser(request);
     }
 
     @DeleteMapping(path = "/delete/{id}")

@@ -26,10 +26,6 @@ public class PostService {
         this.modelMapper = modelMapper;
     }
 
-    public PostService() {
-
-    }
-
     public List<PostDTO> getAllPosts(){
         List<PostEntity> posts = postRepository.findAll();
         List<PostDTO> resp = new ArrayList<>();

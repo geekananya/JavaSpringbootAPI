@@ -9,8 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class SpringbootProjectApplication implements CommandLineRunner {
 
-	@Autowired
-	static  PostService postService;
+//	@Autowired
+//	static  PostService postService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(SpringbootProjectApplication.class, args);
@@ -19,6 +19,5 @@ public class SpringbootProjectApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		postService.getPostById(1L);
 	}
 }

@@ -43,27 +43,6 @@ public class UserService {
 //            return new UserDTO(user.getId(), user.getName(), user.getEmail());
         }
         return new UserDTO();
-        ry.findById(id);
-        if(entity.isPresent()) {
-            UserEntity user = entity.get();
-            return modelMapper.map(user, UserDTO.class);
-//            return new UserDTO(user.getId(), user.getName(), user.getEmail());
-        }
-        return new UserDTO();
-    }
-
-    public UserDTO createNewUser(UserRegisterDTO request){
-        try {
-            UserEntity user = modelMapper.map(request, UserEntity.class);
-            UserEntity saved = userRepository.save(user);
-            System.out.println(saved);
-            UserDTO resp = modelMapper.map(saved, UserDTO.class);
-            System.out.println("User created successfully");
-            return resp;
-        }catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return new UserDTO();
     }
 
     public Long deleteUser(Long id){
