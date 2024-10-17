@@ -17,7 +17,9 @@ public class PostEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private Long authorId;
+    @ManyToOne
+    private UserEntity author;
+
     private String body;
     private String tags;
     private int likes_no;

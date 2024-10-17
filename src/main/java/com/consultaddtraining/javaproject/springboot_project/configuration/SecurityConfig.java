@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .disable()
                 .authorizeHttpRequests()
                 .requestMatchers("/users/update/**",
-                        "/users/delete/**",
+//                        "/users/delete/**",
                         "/posts/create/**",
                         "/posts/update/**",
                         "/posts/delete/**"

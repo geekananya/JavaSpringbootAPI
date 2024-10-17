@@ -33,8 +33,8 @@ public class AuthService {
     public UserEntity signup(UserRegisterDTO request){
         try {
             UserEntity user = modelMapper.map(request, UserEntity.class);
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             UserEntity saved = userRepository.save(user);
-            saved.setPassword(passwordEncoder.encode(user.getPassword()));
             return saved;
         }catch (Exception e) {
             System.out.println(e.getMessage());

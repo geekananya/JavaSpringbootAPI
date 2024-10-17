@@ -9,4 +9,9 @@ import lombok.Setter;
 @Setter
 public class ResourceNotFoundException extends RuntimeException{
     private String message;
+
+    @Override
+    public String getMessage(){
+        return this.message;
+    }
 }

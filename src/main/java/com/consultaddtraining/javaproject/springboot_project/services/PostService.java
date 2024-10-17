@@ -4,6 +4,7 @@ import com.consultaddtraining.javaproject.springboot_project.Entities.PostEntity
 import com.consultaddtraining.javaproject.springboot_project.Entities.UserEntity;
 import com.consultaddtraining.javaproject.springboot_project.dto.PostDTO;
 import com.consultaddtraining.javaproject.springboot_project.dto.UserDTO;
+import com.consultaddtraining.javaproject.springboot_project.exceptions.ResourceNotFoundException;
 import com.consultaddtraining.javaproject.springboot_project.repositories.PostRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,12 +38,12 @@ public class PostService {
     }
 
     public PostDTO getPostById(Long id){
-        Optional<PostEntity> entity = postRepository.findById(id);
-        if(entity.isPresent()) {
-            PostEntity post = entity.get();
+        PostEntity post = postRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("Post not found"));
+//        if(entity.isPresent()) {
+//            PostEntity post = entity.get();
             return modelMapper.map(post, PostDTO.class);
-        }
-        return new PostDTO();
+//        }
     }
 
     public PostDTO createNewPost(PostDTO request){
@@ -54,6 +55,7 @@ public class PostService {
             System.out.println("Post created successfully");
             return resp;
         }catch (Exception e) {
+            System.out.println("Post not created successfully");
             System.out.println(e.getMessage());
         }
         return new PostDTO();

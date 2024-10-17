@@ -1,5 +1,6 @@
 package com.consultaddtraining.javaproject.springboot_project.filters;
 
+import com.consultaddtraining.javaproject.springboot_project.exceptions.NotAuthorizedException;
 import com.consultaddtraining.javaproject.springboot_project.services.JWTService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,7 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.servlet.HandlerExceptionResolver;
+//import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
@@ -22,19 +23,19 @@ import java.io.IOException;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
-    private final HandlerExceptionResolver handlerExceptionResolver;
+//    private final HandlerExceptionResolver handlerExceptionResolver;
 
     private final JWTService jwtService;
     private final UserDetailsService userDetailsService;
 
     public JwtFilter(
             JWTService jwtService,
-            UserDetailsService userDetailsService,
-            HandlerExceptionResolver handlerExceptionResolver
+            UserDetailsService userDetailsService
+//            HandlerExceptionResolver handlerExceptionResolver
     ) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
-        this.handlerExceptionResolver = handlerExceptionResolver;
+//        this.handlerExceptionResolver = handlerExceptionResolver;
     }
 
     @Override
@@ -73,7 +74,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         } catch (Exception exception) {
-            handlerExceptionResolver.resolveException(request, response, null, exception);
+//            handlerExceptionResolver.resolveException(request, response, null, exception);
+            System.out.println("Exception in jwt validation:"+exception.getMessage());
+//            throw new NotAuthorizedException(exception.getMessage());
         }
     }
 }
