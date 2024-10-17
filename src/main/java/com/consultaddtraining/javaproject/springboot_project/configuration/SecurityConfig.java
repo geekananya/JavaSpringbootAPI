@@ -1,6 +1,8 @@
 package com.consultaddtraining.javaproject.springboot_project.configuration;
 
+import com.consultaddtraining.javaproject.springboot_project.filters.CustomAuthenticationEntryPoint;
 import com.consultaddtraining.javaproject.springboot_project.filters.JwtFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -13,6 +15,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Autowired
+    CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     private final AuthenticationProvider authenticationProvider;
     private final JwtFilter jwtFilter;
@@ -27,6 +32,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http.csrf()
                 .disable()
                 .authorizeHttpRequests()
@@ -35,14 +41,16 @@ public class SecurityConfig {
                         "/posts/create/**",
                         "/posts/update/**",
                         "/posts/delete/**"
-                ).authenticated()
+                )
+                .authenticated()
                 .anyRequest().permitAll()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
 
         return http.build();
     }
