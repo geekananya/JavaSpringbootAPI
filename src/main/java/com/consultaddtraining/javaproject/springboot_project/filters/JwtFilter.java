@@ -75,7 +75,7 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (Exception exception) {
 //            handlerExceptionResolver.resolveException(request, response, null, exception);
-//            System.out.println("Exception in jwt validation:"+exception.getMessage());
+            System.out.println("Exception in jwt validation:"+exception.getMessage());
             NotAuthorizedException nae = new NotAuthorizedException(exception.getMessage());
             filterChain.doFilter(request, response);
             throw new RuntimeException(nae.getMessage(), nae);

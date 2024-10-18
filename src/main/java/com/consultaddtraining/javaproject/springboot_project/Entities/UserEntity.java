@@ -1,19 +1,20 @@
 package com.consultaddtraining.javaproject.springboot_project.Entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
-@Data
+@Setter
+@Getter
+//@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserEntity implements UserDetails {
@@ -28,6 +29,19 @@ public class UserEntity implements UserDetails {
 
     @Column(updatable = false)
     private LocalTime createdAt;
+
+
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)   // dont display all posts by students unless needed or asked for(User.getPosts())
+    private List<PostEntity> posts;
+
+    // doesnt create a new column, just defines and creates a relation(table) to manage the many-to-many association.
+    @ManyToMany
+    @JoinTable(name = "user_liked",
+            joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id",
+                    referencedColumnName = "id"))
+    private Set<PostEntity> liked;
+
 
     @PrePersist
     protected void onCreate() {

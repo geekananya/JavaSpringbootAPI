@@ -4,10 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "posts")
-@Data
+@Setter
+@Getter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 //@Builder    // when you need several custom constructors
@@ -17,12 +20,16 @@ public class PostEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
-    private UserEntity author;
 
     private String body;
     private String tags;
-    private int likes_no;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "author_id")
+    private UserEntity author;
+
+    @ManyToMany(mappedBy = "liked", fetch = FetchType.EAGER)     //like cant exist w/o user here
+    private Set<UserEntity> likes;
 
     @Column(updatable = false)
     private LocalTime createdAt;
@@ -30,6 +37,18 @@ public class PostEntity {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalTime.now();
+    }
+
+    public boolean addLike(UserEntity user){
+        boolean added = likes.add(user);
+        if (added) {
+            user.getLiked().add(this); // Make sure to add the reverse relationship
+        }
+        return added;
+    }
+
+    public boolean removeLike(UserEntity user){
+        return likes.remove(user);
     }
 }
 

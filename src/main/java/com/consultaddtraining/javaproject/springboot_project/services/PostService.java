@@ -3,16 +3,16 @@ package com.consultaddtraining.javaproject.springboot_project.services;
 import com.consultaddtraining.javaproject.springboot_project.Entities.PostEntity;
 import com.consultaddtraining.javaproject.springboot_project.Entities.UserEntity;
 import com.consultaddtraining.javaproject.springboot_project.dto.PostDTO;
-import com.consultaddtraining.javaproject.springboot_project.dto.UserDTO;
 import com.consultaddtraining.javaproject.springboot_project.exceptions.ResourceNotFoundException;
 import com.consultaddtraining.javaproject.springboot_project.repositories.PostRepository;
+import com.consultaddtraining.javaproject.springboot_project.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PostService {
@@ -20,12 +20,15 @@ public class PostService {
     //dependency injection
     @Autowired
     final PostRepository postRepository;
+    final UserRepository userRepository;
     final ModelMapper modelMapper;
 
-    public PostService(PostRepository postRepository, ModelMapper modelMapper) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, ModelMapper modelMapper) {
         this.postRepository = postRepository;
+        this.userRepository = userRepository;
         this.modelMapper = modelMapper;
     }
+
 
     public List<PostDTO> getAllPosts(){
         List<PostEntity> posts = postRepository.findAll();
@@ -46,19 +49,15 @@ public class PostService {
 //        }
     }
 
-    public PostDTO createNewPost(PostDTO request){
-        try {
-            PostEntity post = modelMapper.map(request, PostEntity.class);
-            PostEntity saved = postRepository.save(post);
-            System.out.println(saved);
-            PostDTO resp = modelMapper.map(saved, PostDTO.class);
-            System.out.println("Post created successfully");
-            return resp;
-        }catch (Exception e) {
-            System.out.println("Post not created successfully");
-            System.out.println(e.getMessage());
-        }
-        return new PostDTO();
+    public PostDTO createNewPost(PostDTO request, String useremail){
+        PostEntity post = modelMapper.map(request, PostEntity.class);
+        post.setAuthor(userRepository.findByEmail(useremail)
+                .orElseThrow(() -> new ResourceNotFoundException("Author not found")));
+        PostEntity saved = postRepository.save(post);
+        System.out.println(saved);
+        PostDTO resp = modelMapper.map(saved, PostDTO.class);
+        System.out.println("Post created successfully");
+        return resp;
 //        return null;
     }
 
@@ -88,5 +87,22 @@ public class PostService {
         }
         return new PostDTO();
 //        return null;
+    }
+
+    @Transactional
+    public PostDTO likePost(String useremail, Long id){
+        PostEntity post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        UserEntity user = userRepository.findByEmail(useremail).orElseThrow(()-> new ResourceNotFoundException("Authenticated User not found"));
+        boolean l = post.addLike(user);
+
+        if(l) {
+            PostEntity saved = postRepository.save(post);
+            PostDTO resp = modelMapper.map(saved, PostDTO.class);
+            return resp;
+        }else{
+            return modelMapper.map(post, PostDTO.class);
+        }
+
     }
 }

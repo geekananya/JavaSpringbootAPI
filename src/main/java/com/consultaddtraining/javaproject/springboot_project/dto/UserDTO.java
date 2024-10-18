@@ -1,14 +1,17 @@
 package com.consultaddtraining.javaproject.springboot_project.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;     // generates getters and setters
-import lombok.NoArgsConstructor;
+import com.consultaddtraining.javaproject.springboot_project.Entities.PostEntity;
+import lombok.*;
 
-@Data
+import java.util.List;
+
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
     private Long id;
     private String name;
     private String email;
+    private List<PostDTO> posts;
 }
