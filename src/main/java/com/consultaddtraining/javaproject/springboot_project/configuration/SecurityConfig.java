@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -36,7 +37,9 @@ public class SecurityConfig {
         http.csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/users/update/**",
+                .requestMatchers("/secure/**",
+                        "users/1",
+                        "/users/update/**",
 //                        "/users/delete/**",
                         "/posts/create/**",
                         "/posts/update/**",
@@ -45,12 +48,14 @@ public class SecurityConfig {
                 .authenticated()
                 .anyRequest().permitAll()
                 .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
+//                .sessionManagement()
+//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                .and()
+                .oauth2Login(Customizer.withDefaults())
+                .logout(Customizer.withDefaults());
+//                .authenticationProvider(authenticationProvider)
+//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+//                .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
 
         return http.build();
     }
