@@ -32,15 +32,10 @@ public class AuthService {
 
 
     public UserEntity signup(UserRegisterDTO request){
-        try {
-            UserEntity user = modelMapper.map(request, UserEntity.class);
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            UserEntity saved = userRepository.save(user);
-            return saved;
-        }catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return new UserEntity();
+        UserEntity user = modelMapper.map(request, UserEntity.class);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        UserEntity saved = userRepository.save(user);
+        return saved;
     }
 
     public UserEntity authenticate(UserLoginDTO input) {

@@ -3,6 +3,7 @@ package com.consultaddtraining.javaproject.springboot_project.services;
 import com.consultaddtraining.javaproject.springboot_project.Entities.UserEntity;
 import com.consultaddtraining.javaproject.springboot_project.dto.UserDTO;
 import com.consultaddtraining.javaproject.springboot_project.dto.UserRegisterDTO;
+import com.consultaddtraining.javaproject.springboot_project.exceptions.ResourceNotFoundException;
 import com.consultaddtraining.javaproject.springboot_project.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +37,12 @@ public class UserService {
     }
 
     public UserDTO getUserById(Long id){
-        Optional<UserEntity> entity = userRepository.findById(id);
-        if(entity.isPresent()) {
-            UserEntity user = entity.get();
+        UserEntity user = userRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("User not found"));
+//        if(entity.isPresent()) {
             return modelMapper.map(user, UserDTO.class);
 //            return new UserDTO(user.getId(), user.getName(), user.getEmail());
-        }
-        return new UserDTO();
+//        }
+//        return new UserDTO();
     }
 
     public Long deleteUser(Long id){
@@ -58,18 +58,14 @@ public class UserService {
     }
 
     public UserDTO updateUser(Long id, UserDTO request){
-        try {
-            UserEntity user = userRepository.getReferenceById(id);
-            user.setName(request.getName());
-            user.setEmail(request.getEmail());
-            userRepository.save(user);
-            UserDTO resp = modelMapper.map(user, UserDTO.class);
-            System.out.println("Updated "+ user.getId());
-            return resp;
-        }catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return new UserDTO();
-//        return null;
+        UserEntity user = userRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("User not found"));
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+
+        userRepository.save(user);
+
+        UserDTO resp = modelMapper.map(user, UserDTO.class);
+        System.out.println("Updated "+ user.getId());
+        return resp;
     }
 }
